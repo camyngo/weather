@@ -1,0 +1,39 @@
+body {
+
+  font-family: verdana;
+
+}
+
+
+
+#weather-container, #stack-container {
+
+  margin: 2px 2px 2px 2px;
+
+  padding: 5px 5px 5px 5px;
+
+  display: inline-block;
+
+  width: 100%;
+
+}
+
+
+
+#weather-container {
+
+   background-color: rgb(153,204,255);
+
+   height: 600px;
+
+}
+
+
+
+#stack-container {
+
+   background-color: rgb(220,220,220);
+
+   height: 700px;
+
+}

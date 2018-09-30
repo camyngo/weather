@@ -3,8 +3,26 @@
 <head>
 
     <title>Utah City Finder and Weather</title>
-
-    <link rel="stylesheet" href="main.css" >
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+	<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+    <style>
+    input[type="submit"] {
+    width: 120px;
+    margin-left: 200px;
+    display: block;
+    color: red ;
+    background: pink;}
+    
+    input[type="text"]{
+    width: 100px;
+    border: 5px solid green;
+    padding: 10px;
+    margin: 10px;} 
+    
+    body {background-color: #F5FFFA;}
+    </style>
 
     <script
 
@@ -50,43 +68,39 @@
 	});
 });
 
-	$("#weatherButton").click(function(e){
+$("#weatherButton").click(function(e) {
+          var value = $("#cityField").val();
+          var myurl = "https://api.openweathermap.org/data/2.5/weather?units=imperial&appid=db15d3fcb125fea31cf0e68380e99b55&q=";
+          myurl += value;
+          console.log(value);
+          e.preventDefault();
+          $("#displayCity").text(value)
+          $("#weatherHeader").text("Current Weather in " + value + ", Utah:");
+          console.log(myurl);
+          $.ajax({
+              url : myurl,
+              dataType : "json",
+              success : function(parsed_json) {
+                  var location = parsed_json['name'];
+                  var weather = parsed_json['weather'][0]['main'];
+                  var temp = parsed_json['main']['temp'];
+                  var temp_min = parsed_json['main']['temp_min'];
+                  var temp_max = parsed_json['main']['temp_max'];
+                  var humidity = parsed_json['main']['humidity'];
+                  var weather_icon = parsed_json['weather'][0]['icon'];
+                  var wind_speed = parsed_json['wind']['speed']
 
-  	  var value = $("#cityField").val();
-
- 	  console.log(value);
-
-  	  e.preventDefault();
-
-	  $("#displayCity").text(value);
-	
-    var myurl= "https://api.openweathermap.org/data/2.5/weather?units=imperial&appid=APIKEY&q=";
-    myurl += value;
-    console.log(myurl);
-    $.ajax({
-    	url : myurl,
-    	dataType : "json",
-    	success : function(data) {
-         var location = parsed_json['name'];
-            var weather = parsed_json['weather'][0]['main'];
-            var temp = parsed_json['main']['temp'];
-            var weather_icon = parsed_json['weather'][0]['icon'];
-            var humidity = parsed_json['main']['humidity'];
-            var temp_min = parsed_json['main']['temp_min'];
-            var temp_max = parsed_json['main']['temp_max'];
-            var wind_speed = parsed_json['wind']['speed'];
-            everything = "<img src=\"http://openweathermap.org/img/w/" + weather_icon + ".png\"/>"
-            everything += "<ul>";
-            everything += "<li>Location: " + location;
-            everything += "<li>Weather: " + weather + " (" + temp + "&#8457;)";
-            everything += "<li>Low: " + temp_min + "&#8457; | High: " + temp_max + "&#8457;";
-            everything += "<li>Humidity: " + humidity + "%";
-            everything += "<li>Wind: " + wind_speed + " mph";
-            everything += "</ul>";
-            $("#weather").html(everything);
-    }
-  });
-});
+                  everything = "<img src=\"http://openweathermap.org/img/w/" + weather_icon + ".png\"/>"
+                  everything += "<p>Weather: " + weather + "</p>";
+                  everything += "<p>Temperature: " + temp + "°</p>";
+                  everything += "<p>Low: " + temp_min + "° | ";
+                  everything += "High: " + temp_max + "°</p>";
+                  everything += "<p>Humidity: " + humidity + "%</p>";
+                  everything += "<p>Wind Speed: " + wind_speed + "mph</p>";
+                  $("#weather").html(everything);
+              }
+          })
+      });
 
 	$("#searchButton").click(function(f) {
 
@@ -108,25 +122,17 @@
 
 	   success : function(parsed_json) {
 
-		everything = "<ol>";
+		everything = "<ul>";
+		
+		var myarray = parsed_json["items"];
+		$.each(myarray, function(i, item) {
+		console.log(myarray[i]);
+                      everything += "<li> <a href=&quot;" + myarray[i].link + "&quot;>";
+                      everything += myarray[i].title;
+                      everything += "</a></li>";
+	   })
 
-		for(i=0; i < 5; i++) {
-
-		 var title = parsed_json['items'][i]['title'];
-
-		 var link = parsed_json['items'][i]['link'];
-
-		 console.log(title);
-
-	 	 console.log(link);
-
-		 everything += "<li>Title: "+title+"</li>";
-
-		 everything += "	Link: <a href="+link+">click here</a><br>";
-
-		}
-
-		everything += "</ol>";
+		everything += "</ul>";
 
 		$("#searchResults").html(everything);
 
@@ -146,7 +152,6 @@
 
 <body>
 
-<div id="weather-container">
 
 <h1>Current Utah Weather</h1>
 
@@ -158,17 +163,13 @@ Suggested Cities: <span id="txtHint">Empty</span>
 
 </form>
 
-<textarea id="displayCity">No City Submitted</textarea
+<textarea id="displayCity">No City Submitted</textarea>
 
 <p>Current Weather: </p>
 
+
 <div id="weather">No weather</div>
 
-</div>
-
-
-
-<div id="stack-container">
 
 <h1>Stack Exchange Search</h1>
 
@@ -181,10 +182,7 @@ Suggested Cities: <span id="txtHint">Empty</span>
 <br>
 
 <div id="searchResults">No results</div>
-
-</div>
-
-
+</p>
 
 </body>
 
